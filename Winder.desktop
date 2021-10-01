@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Winder
+Comment=Helix Winder project 
+Icon=/home/pi/Documents/PTPIC/ADT_LOGO.png
+Exec=/home/pi/Documants/PTPIC/winderstart.sh
+Type=Application
+Encoding=UTF-8
+Terminal=false
+Categories=None;
