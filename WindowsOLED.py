@@ -16,7 +16,7 @@ class Wdisp(object):
         self.master = Tk()
         self.master.title("OLED Display")
         self._image = Image.new('1', (self.width, self.height))
-        self._image = Image.open('ADT_LOGO.png').resize((self.width,
+        self._image = Image.open('Images/ADT_LOGO.png').resize((self.width,
                                                    self.height),
                                              Image.ANTIALIAS).convert('1')
         self.i = ImageTk.BitmapImage(self._image)

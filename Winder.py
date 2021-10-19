@@ -1,7 +1,7 @@
 ###########################################
 # adt winder object
 #
-# W.K.Todd 02/06/21
+# W.K.Todd 18/10/21
 #
 # winding machine object encapsulates
 # Homing , Start , validation etc.
@@ -47,26 +47,26 @@ class Winder(object):
     #FeederPosition =0
     def __init__(self):
 
-        self.PT = PTPIC()
+        with open('MachineSet.txt') as json_file:  
+            self._MS = json.load(json_file) 
+        
+        self.PT = PTPIC(self._MS["ComPort"])
 
-        self.PT.DEBUG = True
+        if 'Sim' in self._MS["ComPort"]:
+            self.PT.DEBUG = True
+        
         
         self.Spindle = self.PT.GetXaxis() #assign the X channel to spindle
         self.Feeder = self.PT.GetYaxis(self.FeederCB)
         self.Counter = self.PT.GetCounter0(self.CounterCB)
-
         self.Init_Settings()
-        
-        
+
     def __del__(self):
         pass
 
     def Init_Settings(self, Settings = None):
  
-        if Settings == None:
-            with open('MachineSet.txt') as json_file:  
-                self._MS = json.load(json_file)
-        else:
+        if not Settings == None:
             self._MS = Settings
                    
             
@@ -75,6 +75,8 @@ class Winder(object):
         self.Spindle.StepsPerUnit = self._MS['Spindle']['stepsperunit']
         self.Spindle.AccelerationTime = self._MS['Spindle']['accelerationtime'] 
         self.Spindle.MaxSpeed = self._MS['Spindle']['maxspeed']
+        self.Spindle.SetOptions(EnablePolarity = float(self._MS['Spindle']['enablepolarity'])>0, 
+                                )
         
         self.Feeder.Name = "Feeder"
         self.Feeder.Unit = "mm"
@@ -84,6 +86,7 @@ class Winder(object):
         #self.Feeder.EnablePolarity(True)
         self.Feeder.SetOptions(LimitPolarity = True,
                                MotorEnable = False,
+                               EnablePolarity = float(self._MS['Feeder']["enablepolarity"])>0,
                                )
 
 

@@ -1,18 +1,18 @@
 ###########################################
 # ADT winderGUI object
 #
-# W.K.Todd 29/09/2020
+# W.K.Todd 18/10/2020
 #
 # winding machine GUI object
 AppTitle = "Winder"
-AppVersion  = "V1.21"
+AppVersion  = "V1.22"
 #
 ###########################################
 
 
 #tkinter routines for winder GUI
 from CoilTable import CoilTable
-from HelixSettings import MachineSet
+from WinderSettings import MachineSet
 from BobbinSettings import  BobbinGUI, BobbinSet #, Bobbin,
 import json
 #import time
@@ -24,15 +24,10 @@ from tkinter.constants import LEFT,RIGHT,TOP,BOTTOM,SUNKEN,BOTH,RIDGE #,N,S,W,E
 import os.path
 import os
 from WindingGUI import ControlForm
-from OLEDDisplay import OLED
+from OptionalDisplay import OLED
 #from FileUtilities import *
 
-from os import uname
-
-if uname().nodename == 'FastEddy':
-    from PiButtonSim import PiButton
-else:
-    from PiButton import PiButton    
+from OptionalButton import PiButton    #rename file NoOptionalButtons.py to OptionalButtons.py if no buttons
 
 class window(Frame):
     filename=""
@@ -75,7 +70,7 @@ class window(Frame):
         self.Button1 = PiButton(17)
         self.Button2 = PiButton(27)
         #OLED
-        self.OLED = OLED()
+        self.OLED = OLED() #optional local element display
         self.OLED.write(AppTitle  + AppVersion)
 
 
@@ -190,7 +185,7 @@ class window(Frame):
         self.btnWind.pack(side = LEFT, padx =2)
     
         
-        self.imgES=PhotoImage(file="estop-ico.gif")
+        self.imgES=PhotoImage(file="Images/estop-ico.gif")
         self.btnPwrOff = Button(butfrm,text="E-Stop", command= lambda: self.E_Stop(), state='disabled')
         self.btnPwrOff.config(image=self.imgES)
         self.btnPwrOff.pack(side = RIGHT, padx =2)
@@ -506,6 +501,7 @@ class window(Frame):
             
             self.Button1.setfunction(self.winder.Stop)
             self.Button2.setfunction(self.WindPause , once=True)
+            
             self.OLED.buttons("STOP","PAUSE")
             self.OLED.progressbar(0)
     
@@ -548,6 +544,7 @@ class window(Frame):
                 self.OLED.progressbar(100)
                 self.Button1.setfunction(self.winder.Stop)
                 self.Button2.setfunction(self.WindPrep, True)
+                
                 self.OLED.buttons("STOP","NEXT")
             
 
@@ -571,10 +568,11 @@ class window(Frame):
             self.btnPwrOn.config(state = 'disabled')
             self.btnPwrOff.config(state = 'normal')
             self.Table.HighLightOff()
-            self.OLED.clear()
-            self.OLED.write("Home ready")
             self.Button1.setfunction(self.winder.Stop)
             self.Button2.setfunction(self.WindPrep, True)
+            
+            self.OLED.clear()
+            self.OLED.write("Home ready")          
             self.OLED.buttons("STOP","WIND")
 
         elif Status == "Stopped":#power on

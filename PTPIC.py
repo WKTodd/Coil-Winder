@@ -1,8 +1,8 @@
 #-------------------------------------------------------------
 #       PTPIC pyserial test object
 #       Pulse Train PIC (12F1572)
-#       (c) W.K..Todd 2018/19 - 07/06/2020 - simulator added
-ModuleVersion = "1.21"
+#       (c) W.K..Todd 2018/19 - 10/10/2021 - port defined on init
+ModuleVersion = "1.22"
 PICVersion = "1.60"
 PythonVersion  = "3.7.6"
 #-----------------------------------------------------------
@@ -60,16 +60,9 @@ PythonVersion  = "3.7.6"
 #-------------------------------------------------------------
 
 import serial
-import os
-from os import uname
+
 #----------------------------------------------------
-if uname().nodename == 'FastEddy':
-    SIMULATE = True #enable simulation for testing without hardware
-    from PTPICsim import Sim
-else:
-    SIMULATE = False
-    Sim = None
-    
+
     
 class Axis(object):
     '''PTPIC Axis object to handle axis interactions:
@@ -371,23 +364,20 @@ class PTPIC(object):
     BufferEmpty = True
     BufferCount = 0
     CBQ=[]
-    def __init__(self):
+    def __init__(self, SerialPort = 'Simulation', Baud = 19200):
         #print("ptpic created")
 
         #create my serial port object and open it
+        self.__port = SerialPort  
+        self.__Baud = Baud   
         
-        if os.name == 'nt':
-            #windows
-            self.__port='com7'
-        else:
-            #Rpi
-            self.__port='/dev/serial0'
-            
-            
-        if SIMULATE:
+        if 'Sim' in self.__port:
+            from PTPICsim import Sim
             self.__SP = Sim()
         else:
-            self.__SP = self.init_serial()                
+            Sim = None
+            self.__SP = self.init_serial()    
+            
         #reset ptpic
         self.sendtohat("AS00000000")
 
